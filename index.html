@@ -4,238 +4,362 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestor de Gastos</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif}
+:root{
+ --primary:#6366f1;
+ --primary-dark:#4f46e5;
+ --bg:#f8fafc;
+ --card:#ffffff;
+ --text:#0f172a;
+ --muted:#64748b;
+ --danger:#ef4444;
+ --radius:20px;
+}
+
+*{
+ box-sizing:border-box;
+ -webkit-tap-highlight-color:transparent;
+}
+
 body{
-  background:linear-gradient(135deg,#0f172a,#1e293b);
-  color:#fff;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
+ margin:0;
+ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ background:var(--bg);
+ color:var(--text);
 }
-.app{
-  width:100%;
-  max-width:430px;
-  padding:20px;
+
+header{
+ background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+ color:#fff;
+ padding:24px 20px;
+ border-bottom-left-radius:30px;
+ border-bottom-right-radius:30px;
+ box-shadow:0 10px 30px rgba(0,0,0,.15);
 }
+
+header h1{
+ margin:0;
+ font-size:22px;
+ font-weight:600;
+}
+
+.small{
+ font-size:13px;
+ color:var(--muted);
+}
+
+.screen{
+ display:none;
+ padding:20px;
+ padding-bottom:120px;
+}
+
+.active{
+ display:block;
+}
+
 .card{
-  background:#1e293b;
-  border-radius:20px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 10px 25px rgba(0,0,0,.3);
+ background:var(--card);
+ border-radius:var(--radius);
+ padding:18px;
+ margin-bottom:16px;
+ box-shadow:0 8px 25px rgba(0,0,0,.06);
+ transition:.2s ease;
 }
-h1{
-  font-size:22px;
-  margin-bottom:20px;
-  font-weight:700;
+
+.card:hover{
+ transform:translateY(-2px);
+ box-shadow:0 12px 30px rgba(0,0,0,.08);
 }
-.balance{
-  font-size:32px;
-  font-weight:700;
-  margin-top:10px;
+
+h2,h3{
+ margin-top:0;
 }
-.future-month{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  background:#0f172a;
-}
-.fab{
-  position:fixed;
-  bottom:80px;
-  right:20px;
-  width:60px;
-  height:60px;
-  background:#3b82f6;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:32px;
-  cursor:pointer;
-  box-shadow:0 10px 20px rgba(0,0,0,.4);
-}
-.nav{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  background:#0f172a;
-  display:flex;
-  justify-content:space-around;
-  padding:15px 0;
-}
-.nav button{
-  background:none;
-  border:none;
-  color:#94a3b8;
-  font-size:14px;
-}
-.nav button.active{
-  color:#fff;
-  font-weight:600;
-}
-.screen{display:none}
-.screen.active{display:block}
+
 input,select{
-  width:100%;
-  padding:12px;
-  margin-bottom:15px;
-  border-radius:12px;
-  border:none;
+ width:100%;
+ padding:14px;
+ margin:8px 0;
+ border-radius:14px;
+ border:1px solid #e2e8f0;
+ background:#fff;
+ font-size:15px;
+ transition:.2s;
 }
+
+input:focus,select:focus{
+ outline:none;
+ border-color:var(--primary);
+ box-shadow:0 0 0 3px rgba(99,102,241,.15);
+}
+
+button{
+ width:100%;
+ padding:14px;
+ margin:10px 0;
+ border-radius:16px;
+ border:none;
+ font-size:15px;
+ font-weight:600;
+ cursor:pointer;
+ transition:.2s ease;
+}
+
 button.primary{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:none;
-  background:#3b82f6;
-  color:#fff;
-  font-weight:600;
+ background:var(--primary);
+ color:white;
 }
-.expense-item{
-  background:#0f172a;
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:10px;
-  display:flex;
-  justify-content:space-between;
+
+button.primary:active{
+ transform:scale(.97);
+ background:var(--primary-dark);
+}
+
+button.danger{
+ background:var(--danger);
+ color:white;
+}
+
+button.danger:active{
+ transform:scale(.97);
+}
+
+.fab{
+ position:fixed;
+ bottom:85px;
+ right:22px;
+ width:64px;
+ height:64px;
+ border-radius:50%;
+ background:var(--primary);
+ color:white;
+ font-size:34px;
+ border:none;
+ box-shadow:0 12px 30px rgba(99,102,241,.4);
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ transition:.2s ease;
+}
+
+.fab:active{
+ transform:scale(.92);
+}
+
+.bottom-nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ display:flex;
+ justify-content:space-around;
+ background:#ffffff;
+ padding:12px 0;
+ box-shadow:0 -5px 20px rgba(0,0,0,.08);
+ border-top-left-radius:24px;
+ border-top-right-radius:24px;
+}
+
+.bottom-nav button{
+ background:none;
+ border:none;
+ font-weight:600;
+ color:var(--muted);
+ font-size:14px;
+}
+
+.bottom-nav button:active{
+ color:var(--primary);
+}
+
+#totalMes{
+ font-size:32px;
+ font-weight:700;
+ margin-top:8px;
 }
 </style>
+
 </head>
 <body>
-<div class="app">
+
+<header>
+<h1>Gestor de Gastos</h1>
+<p class="small">Control mensual inteligente</p>
+</header>
 
 <div id="home" class="screen active">
-<h1>Resumen</h1>
-<div class="card">
-<p>Gasto mes actual</p>
-<div class="balance" id="currentTotal">$0</div>
+<div class="card" style="text-align:center">
+<p class="small">Gasto del mes actual</p>
+<h2 id="totalMes">$0</h2>
 </div>
+
 <div class="card">
-<p>Próximos 3 meses</p>
-<div id="futureMonths"></div>
+<p class="small">Próximos 3 meses</p>
+<div id="futurosMeses"></div>
 </div>
 </div>
 
 <div id="new" class="screen">
-<h1>Nuevo gasto</h1>
-<input type="text" id="name" placeholder="Nombre">
-<input type="number" id="amount" placeholder="Monto">
-<select id="type">
-<option value="single">Pago único</option>
-<option value="installments">En cuotas</option>
+<h2>Nuevo gasto</h2>
+<input id="desc" placeholder="Descripción">
+<input id="monto" type="number" placeholder="Monto total">
+<select id="tipo">
+<option value="1">Pago único</option>
+<option value="cuotas">En cuotas</option>
 </select>
-<input type="number" id="installments" placeholder="Cantidad de cuotas" style="display:none">
-<button class="primary" onclick="saveExpense()">Guardar</button>
+<input id="cuotas" type="number" placeholder="Cantidad de cuotas">
+<label class="small">Fecha del primer pago</label>
+<input id="fecha" type="date">
+<select id="metodo"></select>
+<button class="primary" onclick="guardar()">Guardar gasto</button>
 </div>
 
 <div id="list" class="screen">
-<h1>Lista de gastos</h1>
-<div id="expenseList"></div>
+<h2>Gastos</h2>
+<div id="lista"></div>
 </div>
+
+<div id="detail" class="screen"></div>
 
 <div id="settings" class="screen">
-<h1>Ajustes</h1>
-<p>Próximamente...</p>
+<h2>Ajustes</h2>
+<input id="ingreso" type="number" placeholder="Ingreso mensual">
+<h3>Métodos de pago</h3>
+<input id="nuevoMetodo" placeholder="Nuevo método">
+<button class="primary" onclick="agregarMetodo()">Agregar método</button>
+<div id="metodos"></div>
+<button class="primary" onclick="guardarAjustes()">Guardar ajustes</button>
 </div>
 
-</div>
+<button class="fab" onclick="mostrar('new')">+</button>
 
-<div class="fab" onclick="showScreen('new')">+</div>
-
-<div class="nav">
-<button onclick="showScreen('home')" class="active">Inicio</button>
-<button onclick="showScreen('list')">Gastos</button>
-<button onclick="showScreen('settings')">Ajustes</button>
+<div class="bottom-nav">
+<button onclick="mostrar('home')">Home</button>
+<button onclick="mostrar('list')">Gastos</button>
+<button onclick="mostrar('settings')">Ajustes</button>
 </div>
 
 <script>
-let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+let db = JSON.parse(localStorage.getItem('db')) || {
+ ingreso:0,
+ metodos:['Efectivo'],
+ gastos:[]
+};
 
-function saveExpense(){
-  const name=document.getElementById("name").value;
-  const amount=parseFloat(document.getElementById("amount").value);
-  const type=document.getElementById("type").value;
-  const installments=parseInt(document.getElementById("installments").value)||1;
-  if(!name||!amount)return;
+function save(){localStorage.setItem('db',JSON.stringify(db));}
 
-  expenses.push({name,amount,type,installments,date:new Date()});
-  localStorage.setItem("expenses",JSON.stringify(expenses));
-  updateUI();
-  showScreen("home");
+function mostrar(id){
+ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ if(id==='home')calcular();
+ if(id==='list')renderLista();
+ if(id==='new')cargarMetodos();
+ if(id==='settings')renderSettings();
 }
 
-function updateUI(){
-  const now=new Date();
-  const currentMonth=now.getMonth();
-  const currentYear=now.getFullYear();
+function guardar(){
+ if(!fecha.value || !metodo.value) return alert('Falta completar datos');
+ db.gastos.push({
+  id:Date.now(),
+  d:desc.value,
+  m:+monto.value,
+  c:tipo.value==='cuotas'?+cuotas.value:1,
+  f:fecha.value,
+  p:metodo.value
+ });
+ save();
+ mostrar('home');
+}
 
-  let currentTotal=0;
-  let futureTotals=[0,0,0];
+function calcular(){
+ let hoy=new Date();
+ let total=0;
+ let mapaMeses={};
 
-  expenses.forEach(e=>{
-    for(let i=0;i<e.installments;i++){
-      const d=new Date(e.date);
-      d.setMonth(d.getMonth()+i);
-      if(d.getMonth()===currentMonth&&d.getFullYear()===currentYear){
-        currentTotal+=e.amount;
-      }
-      for(let j=1;j<=3;j++){
-        let future=new Date(now);
-        future.setMonth(future.getMonth()+j);
-        if(d.getMonth()===future.getMonth()&&d.getFullYear()===future.getFullYear()){
-          futureTotals[j-1]+=e.amount;
-        }
-      }
-    }
-  });
-
-  document.getElementById("currentTotal").innerText="$"+currentTotal;
-
-  const monthsContainer=document.getElementById("futureMonths");
-  monthsContainer.innerHTML="";
-  for(let i=1;i<=3;i++){
-    let d=new Date();
-    d.setMonth(d.getMonth()+i);
-    const monthName=d.toLocaleString("es-ES",{month:"long",year:"numeric"});
-    monthsContainer.innerHTML+=`
-      <div class="future-month">
-        <span>${monthName}</span>
-        <span>$${futureTotals[i-1]}</span>
-      </div>`;
+ db.gastos.forEach(g=>{
+  let inicio=new Date(g.f);
+  let cuota=g.m/g.c;
+  for(let i=0;i<g.c;i++){
+   let d=new Date(inicio);
+   d.setMonth(d.getMonth()+i);
+   let key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+   if(d.getMonth()===hoy.getMonth() && d.getFullYear()===hoy.getFullYear()){
+    total+=cuota;
+   }
+   mapaMeses[key]=(mapaMeses[key]||0)+cuota;
   }
+ });
 
-  const list=document.getElementById("expenseList");
-  list.innerHTML="";
-  expenses.forEach(e=>{
-    list.innerHTML+=`
-      <div class="expense-item">
-        <span>${e.name}</span>
-        <span>$${e.amount}</span>
-      </div>`;
-  });
+ totalMes.textContent='$'+Math.round(total);
+
+ let mesesOrdenados = Object.keys(mapaMeses).sort();
+ let actuales = mesesOrdenados.filter(k=>{
+  let [y,m]=k.split('-').map(Number);
+  return y>hoy.getFullYear() || (y===hoy.getFullYear() && m>hoy.getMonth()+1);
+ }).slice(0,3);
+
+ let cont=document.getElementById('futurosMeses');
+ cont.innerHTML = actuales.length
+  ? actuales.map(k=>`<div>${k}: $${Math.round(mapaMeses[k])}</div>`).join('')
+  : '<div class="small">No hay gastos futuros</div>';
 }
 
-function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
-  if(id==="home")document.querySelectorAll(".nav button")[0].classList.add("active");
-  if(id==="list")document.querySelectorAll(".nav button")[1].classList.add("active");
-  if(id==="settings")document.querySelectorAll(".nav button")[2].classList.add("active");
+function renderLista(){
+ lista.innerHTML='';
+ db.gastos.forEach(g=>{
+  lista.innerHTML+=`
+  <div class="card">
+   <b>${g.d}</b><br>
+   $${g.m} – ${g.c} cuotas<br>
+   <button onclick="ver(${g.id})">Ver detalle</button>
+  </div>`;
+ });
 }
 
-document.getElementById("type").addEventListener("change",function(){
-  document.getElementById("installments").style.display=
-  this.value==="installments"?"block":"none";
-});
+function ver(id){
+ let g=db.gastos.find(x=>x.id===id);
+ let fin=new Date(g.f); fin.setMonth(fin.getMonth()+g.c-1);
+ detail.innerHTML=`
+ <h2>${g.d}</h2>
+ <p>Monto total: $${g.m}</p>
+ <p>Cuotas: ${g.c}</p>
+ <p>Primer pago: ${g.f}</p>
+ <p>Finaliza: ${fin.toISOString().slice(0,10)}</p>
+ <p>Método: ${g.p}</p>
+ <button class="danger" onclick="eliminar(${id})">Eliminar</button>
+ <button onclick="mostrar('list')">Volver</button>`;
+ mostrar('detail');
+}
 
-updateUI();
+function eliminar(id){
+ db.gastos=db.gastos.filter(g=>g.id!==id);
+ save(); mostrar('home');
+}
+
+function cargarMetodos(){
+ metodo.innerHTML='';
+ db.metodos.forEach(m=>metodo.innerHTML+=`<option>${m}</option>`);
+}
+
+function agregarMetodo(){
+ if(!nuevoMetodo.value) return;
+ db.metodos.push(nuevoMetodo.value);
+ nuevoMetodo.value='';
+ save(); renderSettings();
+}
+
+function renderSettings(){
+ ingreso.value=db.ingreso;
+ metodos.innerHTML=db.metodos.map(m=>'<div>'+m+'</div>').join('');
+}
+
+function guardarAjustes(){
+ db.ingreso=+ingreso.value;
+ save(); mostrar('home');
+}
+
+calcular();
 </script>
 
 </body>
