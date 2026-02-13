@@ -29,12 +29,7 @@ input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:12px;bord
 button.primary{background:#2563eb;color:white;border:none}
 button.danger{background:#dc2626;color:white;border:none}
 
-/* nuevos bloques */
-.row-3{
- display:flex;
- gap:8px;
- margin-bottom:12px;
-}
+.row-3{display:flex;gap:8px;margin-bottom:12px}
 .mini-card{
  flex:1;
  background:#fff;
@@ -43,7 +38,11 @@ button.danger{background:#dc2626;color:white;border:none}
  text-align:center;
  box-shadow:0 3px 8px rgba(0,0,0,.05);
  font-size:13px;
+ cursor:pointer;
 }
+.mini-card:hover{background:#e2e8f0}
+.clickable{cursor:pointer}
+.clickable:hover{background:#e2e8f0}
 </style>
 </head>
 <body>
@@ -55,9 +54,10 @@ button.danger{background:#dc2626;color:white;border:none}
 
 <div id="home" class="screen active">
 
-<div class="card" style="text-align:center">
+<div class="card clickable" onclick="verMes(mesActualKey)" style="text-align:center">
 <p class="small">Mes actual</p>
 <h2 id="totalMes">$0.00</h2>
+<p id="nombreMesActual" class="small"></p>
 </div>
 
 <div id="tresMeses"></div>
@@ -68,6 +68,8 @@ button.danger{background:#dc2626;color:white;border:none}
 </div>
 
 </div>
+
+<div id="mesDetalle" class="screen"></div>
 
 <div id="new" class="screen">
 <h2>Nuevo gasto</h2>
@@ -116,6 +118,9 @@ let db = JSON.parse(localStorage.getItem('db')) || {
  gastos:[]
 };
 
+let mapaMesesGlobal = {};
+let mesActualKey = '';
+
 function save(){localStorage.setItem('db',JSON.stringify(db));}
 
 function mostrar(id){
@@ -125,6 +130,10 @@ function mostrar(id){
  if(id==='list')renderLista();
  if(id==='new')cargarMetodos();
  if(id==='settings')renderSettings();
+}
+
+function nombreMes(date){
+ return date.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
 }
 
 function guardar(){
@@ -143,56 +152,78 @@ function guardar(){
 
 function calcular(){
  let hoy=new Date();
- let totalActual=0;
- let mapaMeses={};
+ mesActualKey=hoy.getFullYear()+'-'+String(hoy.getMonth()+1).padStart(2,'0');
+ mapaMesesGlobal={};
 
  db.gastos.forEach(g=>{
   let inicio=new Date(g.f);
-  let cuota = Math.round((g.m / g.c) * 100) / 100;
+  let cuota=Math.round((g.m/g.c)*100)/100;
 
   for(let i=0;i<g.c;i++){
    let d=new Date(inicio);
    d.setMonth(d.getMonth()+i);
    let key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 
-   if(d.getMonth()===hoy.getMonth() && d.getFullYear()===hoy.getFullYear()){
-    totalActual+=cuota;
-   }
-
-   mapaMeses[key]=(mapaMeses[key]||0)+cuota;
+   if(!mapaMesesGlobal[key]) mapaMesesGlobal[key]=[];
+   mapaMesesGlobal[key].push({
+    desc:g.d,
+    monto:cuota
+   });
   }
  });
 
- totalMes.textContent='$'+totalActual.toFixed(2);
+ let totalActual=(mapaMesesGlobal[mesActualKey]||[])
+  .reduce((a,b)=>a+b.monto,0);
 
- // generar próximos 12 meses
+ totalMes.textContent='$'+totalActual.toFixed(2);
+ nombreMesActual.textContent=nombreMes(hoy);
+
  let meses=[];
  for(let i=1;i<=12;i++){
   let d=new Date(hoy);
   d.setMonth(d.getMonth()+i);
   let key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-  meses.push({
-   key:key,
-   total:(mapaMeses[key]||0).toFixed(2)
-  });
+  meses.push({date:d,key});
  }
 
- // primeros 3 en horizontal
  tresMeses.innerHTML=
  `<div class="row-3">`+
- meses.slice(0,3).map(m=>
-  `<div class="mini-card">
-   <div>${m.key}</div>
-   <b>$${m.total}</b>
-  </div>`
- ).join('')
+ meses.slice(0,3).map(m=>{
+  let total=(mapaMesesGlobal[m.key]||[])
+   .reduce((a,b)=>a+b.monto,0);
+  return `<div class="mini-card" onclick="verMes('${m.key}')">
+   <div>${nombreMes(m.date)}</div>
+   <b>$${total.toFixed(2)}</b>
+  </div>`;
+ }).join('')
  +`</div>`;
 
- // siguientes 9 en lista
  nueveMeses.innerHTML=
- meses.slice(3).map(m=>
-  `<div>${m.key}: $${m.total}</div>`
- ).join('');
+ meses.slice(3).map(m=>{
+  let total=(mapaMesesGlobal[m.key]||[])
+   .reduce((a,b)=>a+b.monto,0);
+  return `<div>${nombreMes(m.date)}: $${total.toFixed(2)}</div>`;
+ }).join('');
+}
+
+function verMes(key){
+ let gastos=mapaMesesGlobal[key]||[];
+ let total=gastos.reduce((a,b)=>a+b.monto,0);
+
+ let fechaParts=key.split('-');
+ let d=new Date(fechaParts[0],fechaParts[1]-1,1);
+
+ mesDetalle.innerHTML=`
+ <h2>${nombreMes(d)}</h2>
+ <p>Total: $${total.toFixed(2)}</p>
+ <div class="card">
+ ${gastos.length
+   ? gastos.map(g=>`<div>${g.desc}: $${g.monto.toFixed(2)}</div>`).join('')
+   : '<div class="small">No hay gastos este mes</div>'}
+ </div>
+ <button onclick="mostrar('home')">Volver</button>
+ `;
+ mostrar('mesDetalle');
 }
 
 function renderLista(){
