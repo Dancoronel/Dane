@@ -7,11 +7,13 @@
 
 <style>
 :root{
- --bg:#f3f4f6;
+ --bg:#f4f6f9;
  --card:#ffffff;
  --primary:#2563eb;
+ --primary-soft:#e8f0ff;
  --dark:#0f172a;
  --muted:#6b7280;
+ --border:#e5e7eb;
  --danger:#dc2626;
 }
 
@@ -19,82 +21,103 @@
 
 body{
  margin:0;
- font-family:system-ui,-apple-system;
+ font-family:system-ui,-apple-system,BlinkMacSystemFont;
  background:var(--bg);
  color:var(--dark);
+ line-height:1.45;
 }
+
+/* HEADER */
 
 header{
  background:var(--dark);
- color:#fff;
- padding:20px;
+ color:white;
+ padding:20px 18px;
 }
 
-h1{margin:0;font-size:20px;font-weight:600}
-h2{margin:0 0 10px;font-size:18px}
-.small{font-size:13px;color:var(--muted)}
+header h1{
+ margin:0;
+ font-size:20px;
+ font-weight:600;
+}
+
+/* SCREENS */
 
 .screen{
  display:none;
- padding:18px;
- padding-bottom:100px;
+ padding:20px 18px;
+ padding-bottom:110px;
 }
 
 .active{display:block}
 
+/* CARD */
+
 .card{
  background:var(--card);
- border-radius:16px;
- padding:18px;
- margin-bottom:16px;
- box-shadow:0 3px 10px rgba(0,0,0,.05);
+ border-radius:18px;
+ padding:20px;
+ margin-bottom:18px;
+ box-shadow:0 4px 14px rgba(0,0,0,.06);
 }
 
-.total-box{
- text-align:center;
- padding:24px 16px;
-}
-
-.total-box h2{
- font-size:34px;
- margin:8px 0;
-}
-
-.mes-nombre{
- font-size:14px;
+.small{
+ font-size:13px;
  color:var(--muted);
 }
 
+/* TOTAL PRINCIPAL */
+
+.total-principal{
+ text-align:center;
+ cursor:pointer;
+}
+
+#totalMes{
+ font-size:36px;
+ font-weight:700;
+ margin:10px 0 6px;
+}
+
+/* MINI MESES */
+
 .row-3{
  display:flex;
- gap:10px;
- margin-bottom:18px;
+ gap:12px;
+ margin-bottom:20px;
 }
 
 .mini-card{
  flex:1;
  background:var(--card);
- border-radius:14px;
- padding:14px 10px;
+ border-radius:16px;
+ padding:14px;
  text-align:center;
- box-shadow:0 2px 6px rgba(0,0,0,.05);
+ box-shadow:0 3px 10px rgba(0,0,0,.05);
  cursor:pointer;
+ transition:.15s ease;
+}
+
+.mini-card:hover{
+ background:var(--primary-soft);
 }
 
 .mini-card .mes{
  font-size:13px;
  color:var(--muted);
- margin-bottom:6px;
 }
 
 .mini-card .monto{
  font-size:16px;
  font-weight:600;
+ margin-top:6px;
 }
 
+/* LISTA MESES */
+
 .lista-meses div{
- padding:10px 0;
- border-bottom:1px solid #e5e7eb;
+ padding:12px 0;
+ border-bottom:1px solid var(--border);
  font-size:14px;
 }
 
@@ -102,57 +125,92 @@ h2{margin:0 0 10px;font-size:18px}
  border:none;
 }
 
+/* DETALLE MES */
+
 .gasto-item{
  display:flex;
  justify-content:space-between;
- padding:12px 0;
- border-bottom:1px solid #e5e7eb;
+ align-items:center;
+ padding:14px 0;
+ border-bottom:1px solid var(--border);
+ font-size:14px;
 }
 
 .gasto-item:last-child{
  border:none;
 }
 
-.bottom-nav{
- position:fixed;
- bottom:0;left:0;right:0;
- display:flex;
- justify-content:space-around;
- background:var(--dark);
- padding:10px 0;
+/* FORM */
+
+input,select{
+ width:100%;
+ padding:14px;
+ margin:8px 0;
+ border-radius:14px;
+ border:1px solid var(--border);
+ font-size:14px;
 }
 
-.bottom-nav button{
- background:none;
- border:none;
- color:#fff;
- font-size:14px;
+input:focus,select:focus{
+ outline:none;
+ border-color:var(--primary);
 }
 
 button{
  width:100%;
- padding:12px;
- margin-top:10px;
- border-radius:12px;
+ padding:14px;
+ margin-top:12px;
+ border-radius:14px;
  border:none;
  font-size:14px;
+ font-weight:600;
+ cursor:pointer;
 }
 
-button.primary{background:var(--primary);color:#fff}
-button.danger{background:var(--danger);color:#fff}
+button.primary{
+ background:var(--primary);
+ color:white;
+}
+
+button.danger{
+ background:var(--danger);
+ color:white;
+}
+
+/* FAB */
 
 .fab{
  position:fixed;
- bottom:70px;
+ bottom:80px;
  right:20px;
  width:58px;
  height:58px;
  border-radius:50%;
  background:var(--primary);
  color:white;
- font-size:30px;
+ font-size:28px;
  border:none;
- box-shadow:0 6px 16px rgba(0,0,0,.25);
+ box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+/* NAV */
+
+.bottom-nav{
+ position:fixed;
+ bottom:0;
+ left:0;
+ right:0;
+ display:flex;
+ justify-content:space-around;
+ background:var(--dark);
+ padding:12px 0;
+}
+
+.bottom-nav button{
+ background:none;
+ border:none;
+ color:white;
+ font-size:13px;
 }
 </style>
 </head>
@@ -162,12 +220,14 @@ button.danger{background:var(--danger);color:#fff}
 <h1>Gestor de Gastos</h1>
 </header>
 
+<!-- HOME -->
+
 <div id="home" class="screen active">
 
-<div class="card total-box" onclick="verMes(mesActualKey)">
+<div class="card total-principal" onclick="verMes(mesActualKey)">
 <div class="small">Mes actual</div>
 <h2 id="totalMes">$0.00</h2>
-<div id="nombreMesActual" class="mes-nombre"></div>
+<div id="nombreMesActual" class="small"></div>
 </div>
 
 <div id="tresMeses"></div>
@@ -179,12 +239,56 @@ button.danger{background:var(--danger);color:#fff}
 
 </div>
 
+<!-- DETALLE MES -->
+
 <div id="mesDetalle" class="screen"></div>
 
-<button class="fab" onclick="mostrar('home')">+</button>
+<!-- NUEVO -->
+
+<div id="new" class="screen">
+<h2>Nuevo gasto</h2>
+<input id="desc" placeholder="Descripción">
+<input id="monto" type="number" step="0.01" placeholder="Monto total">
+<select id="tipo">
+<option value="1">Pago único</option>
+<option value="cuotas">En cuotas</option>
+</select>
+<input id="cuotas" type="number" placeholder="Cantidad de cuotas">
+<label class="small">Fecha del primer pago</label>
+<input id="fecha" type="date">
+<select id="metodo"></select>
+<button class="primary" onclick="guardar()">Guardar gasto</button>
+</div>
+
+<!-- LISTA -->
+
+<div id="list" class="screen">
+<h2>Gastos</h2>
+<div id="lista"></div>
+</div>
+
+<!-- DETALLE GASTO -->
+
+<div id="detail" class="screen"></div>
+
+<!-- SETTINGS -->
+
+<div id="settings" class="screen">
+<h2>Ajustes</h2>
+<input id="ingreso" type="number" step="0.01" placeholder="Ingreso mensual">
+<h3>Métodos de pago</h3>
+<input id="nuevoMetodo" placeholder="Nuevo método">
+<button class="primary" onclick="agregarMetodo()">Agregar método</button>
+<div id="metodos"></div>
+<button class="primary" onclick="guardarAjustes()">Guardar ajustes</button>
+</div>
+
+<button class="fab" onclick="mostrar('new')">+</button>
 
 <div class="bottom-nav">
 <button onclick="mostrar('home')">Home</button>
+<button onclick="mostrar('list')">Gastos</button>
+<button onclick="mostrar('settings')">Ajustes</button>
 </div>
 
 <script>
@@ -197,14 +301,33 @@ let db = JSON.parse(localStorage.getItem('db')) || {
 let mapaMesesGlobal = {};
 let mesActualKey = '';
 
+function save(){localStorage.setItem('db',JSON.stringify(db));}
+
 function mostrar(id){
  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
  document.getElementById(id).classList.add('active');
  if(id==='home')calcular();
+ if(id==='list')renderLista();
+ if(id==='new')cargarMetodos();
+ if(id==='settings')renderSettings();
 }
 
 function nombreMes(date){
  return date.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
+}
+
+function guardar(){
+ if(!fecha.value || !metodo.value) return alert('Falta completar datos');
+ db.gastos.push({
+  id:Date.now(),
+  d:desc.value,
+  m:+monto.value,
+  c:tipo.value==='cuotas'?+cuotas.value:1,
+  f:fecha.value,
+  p:metodo.value
+ });
+ save();
+ mostrar('home');
 }
 
 function calcular(){
@@ -267,8 +390,8 @@ function verMes(key){
  mesDetalle.innerHTML=`
  <div class="card">
  <h2>${nombreMes(d)}</h2>
- <div class="small" style="margin-bottom:8px">Total</div>
- <div style="font-size:26px;font-weight:600;margin-bottom:18px">$${total.toFixed(2)}</div>
+ <div class="small">Total</div>
+ <div style="font-size:28px;font-weight:700;margin:10px 0 20px">$${total.toFixed(2)}</div>
  ${gastos.length
    ? gastos.map(g=>`
      <div class="gasto-item">
@@ -281,6 +404,65 @@ function verMes(key){
  </div>
  `;
  mostrar('mesDetalle');
+}
+
+function renderLista(){
+ lista.innerHTML='';
+ db.gastos.forEach(g=>{
+  lista.innerHTML+=`
+  <div class="card">
+   <b>${g.d}</b><br>
+   $${g.m.toFixed(2)} – ${g.c} cuotas<br>
+   <button onclick="ver(${g.id})">Ver detalle</button>
+  </div>`;
+ });
+}
+
+function ver(id){
+ let g=db.gastos.find(x=>x.id===id);
+ let fin=new Date(g.f); 
+ fin.setMonth(fin.getMonth()+g.c-1);
+
+ detail.innerHTML=`
+ <h2>${g.d}</h2>
+ <p>Monto total: $${g.m.toFixed(2)}</p>
+ <p>Cuotas: ${g.c}</p>
+ <p>Primer pago: ${g.f}</p>
+ <p>Finaliza: ${fin.toISOString().slice(0,10)}</p>
+ <p>Método: ${g.p}</p>
+ <button class="danger" onclick="eliminar(${id})">Eliminar</button>
+ <button onclick="mostrar('list')">Volver</button>`;
+ mostrar('detail');
+}
+
+function eliminar(id){
+ db.gastos=db.gastos.filter(g=>g.id!==id);
+ save();
+ mostrar('home');
+}
+
+function cargarMetodos(){
+ metodo.innerHTML='';
+ db.metodos.forEach(m=>metodo.innerHTML+=`<option>${m}</option>`);
+}
+
+function agregarMetodo(){
+ if(!nuevoMetodo.value) return;
+ db.metodos.push(nuevoMetodo.value);
+ nuevoMetodo.value='';
+ save();
+ renderSettings();
+}
+
+function renderSettings(){
+ ingreso.value=db.ingreso;
+ metodos.innerHTML=db.metodos.map(m=>'<div>'+m+'</div>').join('');
+}
+
+function guardarAjustes(){
+ db.ingreso=+ingreso.value;
+ save();
+ mostrar('home');
 }
 
 calcular();
