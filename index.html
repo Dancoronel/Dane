@@ -6,109 +6,185 @@
 <title>Gestor de Gastos</title>
 
 <style>
-body{margin:0;font-family:system-ui;background:#f1f5f9}
-header{background:#0f172a;color:#fff;padding:16px}
-.screen{display:none;padding:16px;padding-bottom:90px}
-.active{display:block}
-.card{background:#fff;border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 4px 10px rgba(0,0,0,.06)}
-.small{font-size:12px;color:#64748b}
-.bottom-nav{
- position:fixed;bottom:0;left:0;right:0;
- display:flex;justify-content:space-around;
- background:#0f172a;color:#fff;padding:10px 0
+:root{
+ --bg:#f3f4f6;
+ --card:#ffffff;
+ --primary:#2563eb;
+ --dark:#0f172a;
+ --muted:#6b7280;
+ --danger:#dc2626;
 }
-.bottom-nav button{background:none;border:none;color:white;font-size:14px}
-.fab{
- position:fixed;bottom:70px;right:20px;
- width:60px;height:60px;border-radius:50%;
- background:#2563eb;color:white;
- font-size:34px;border:none;
- box-shadow:0 8px 16px rgba(0,0,0,.25)
-}
-input,select,button{width:100%;padding:12px;margin:6px 0;border-radius:12px;border:1px solid #cbd5e1}
-button.primary{background:#2563eb;color:white;border:none}
-button.danger{background:#dc2626;color:white;border:none}
 
-.row-3{display:flex;gap:8px;margin-bottom:12px}
+*{box-sizing:border-box}
+
+body{
+ margin:0;
+ font-family:system-ui,-apple-system;
+ background:var(--bg);
+ color:var(--dark);
+}
+
+header{
+ background:var(--dark);
+ color:#fff;
+ padding:20px;
+}
+
+h1{margin:0;font-size:20px;font-weight:600}
+h2{margin:0 0 10px;font-size:18px}
+.small{font-size:13px;color:var(--muted)}
+
+.screen{
+ display:none;
+ padding:18px;
+ padding-bottom:100px;
+}
+
+.active{display:block}
+
+.card{
+ background:var(--card);
+ border-radius:16px;
+ padding:18px;
+ margin-bottom:16px;
+ box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+
+.total-box{
+ text-align:center;
+ padding:24px 16px;
+}
+
+.total-box h2{
+ font-size:34px;
+ margin:8px 0;
+}
+
+.mes-nombre{
+ font-size:14px;
+ color:var(--muted);
+}
+
+.row-3{
+ display:flex;
+ gap:10px;
+ margin-bottom:18px;
+}
+
 .mini-card{
  flex:1;
- background:#fff;
+ background:var(--card);
  border-radius:14px;
- padding:10px;
+ padding:14px 10px;
  text-align:center;
- box-shadow:0 3px 8px rgba(0,0,0,.05);
- font-size:13px;
+ box-shadow:0 2px 6px rgba(0,0,0,.05);
  cursor:pointer;
 }
-.mini-card:hover{background:#e2e8f0}
-.clickable{cursor:pointer}
-.clickable:hover{background:#e2e8f0}
+
+.mini-card .mes{
+ font-size:13px;
+ color:var(--muted);
+ margin-bottom:6px;
+}
+
+.mini-card .monto{
+ font-size:16px;
+ font-weight:600;
+}
+
+.lista-meses div{
+ padding:10px 0;
+ border-bottom:1px solid #e5e7eb;
+ font-size:14px;
+}
+
+.lista-meses div:last-child{
+ border:none;
+}
+
+.gasto-item{
+ display:flex;
+ justify-content:space-between;
+ padding:12px 0;
+ border-bottom:1px solid #e5e7eb;
+}
+
+.gasto-item:last-child{
+ border:none;
+}
+
+.bottom-nav{
+ position:fixed;
+ bottom:0;left:0;right:0;
+ display:flex;
+ justify-content:space-around;
+ background:var(--dark);
+ padding:10px 0;
+}
+
+.bottom-nav button{
+ background:none;
+ border:none;
+ color:#fff;
+ font-size:14px;
+}
+
+button{
+ width:100%;
+ padding:12px;
+ margin-top:10px;
+ border-radius:12px;
+ border:none;
+ font-size:14px;
+}
+
+button.primary{background:var(--primary);color:#fff}
+button.danger{background:var(--danger);color:#fff}
+
+.fab{
+ position:fixed;
+ bottom:70px;
+ right:20px;
+ width:58px;
+ height:58px;
+ border-radius:50%;
+ background:var(--primary);
+ color:white;
+ font-size:30px;
+ border:none;
+ box-shadow:0 6px 16px rgba(0,0,0,.25);
+}
 </style>
 </head>
 <body>
 
 <header>
 <h1>Gestor de Gastos</h1>
-<p class="small">Control mensual inteligente</p>
 </header>
 
 <div id="home" class="screen active">
 
-<div class="card clickable" onclick="verMes(mesActualKey)" style="text-align:center">
-<p class="small">Mes actual</p>
+<div class="card total-box" onclick="verMes(mesActualKey)">
+<div class="small">Mes actual</div>
 <h2 id="totalMes">$0.00</h2>
-<p id="nombreMesActual" class="small"></p>
+<div id="nombreMesActual" class="mes-nombre"></div>
 </div>
 
 <div id="tresMeses"></div>
 
 <div class="card">
-<p class="small">Próximos 9 meses</p>
-<div id="nueveMeses"></div>
+<div class="small" style="margin-bottom:10px">Próximos 9 meses</div>
+<div id="nueveMeses" class="lista-meses"></div>
 </div>
 
 </div>
 
 <div id="mesDetalle" class="screen"></div>
 
-<div id="new" class="screen">
-<h2>Nuevo gasto</h2>
-<input id="desc" placeholder="Descripción">
-<input id="monto" type="number" step="0.01" placeholder="Monto total">
-<select id="tipo">
-<option value="1">Pago único</option>
-<option value="cuotas">En cuotas</option>
-</select>
-<input id="cuotas" type="number" placeholder="Cantidad de cuotas">
-<label class="small">Fecha del primer pago</label>
-<input id="fecha" type="date">
-<select id="metodo"></select>
-<button class="primary" onclick="guardar()">Guardar gasto</button>
-</div>
-
-<div id="list" class="screen">
-<h2>Gastos</h2>
-<div id="lista"></div>
-</div>
-
-<div id="detail" class="screen"></div>
-
-<div id="settings" class="screen">
-<h2>Ajustes</h2>
-<input id="ingreso" type="number" step="0.01" placeholder="Ingreso mensual">
-<h3>Métodos de pago</h3>
-<input id="nuevoMetodo" placeholder="Nuevo método">
-<button class="primary" onclick="agregarMetodo()">Agregar método</button>
-<div id="metodos"></div>
-<button class="primary" onclick="guardarAjustes()">Guardar ajustes</button>
-</div>
-
-<button class="fab" onclick="mostrar('new')">+</button>
+<button class="fab" onclick="mostrar('home')">+</button>
 
 <div class="bottom-nav">
 <button onclick="mostrar('home')">Home</button>
-<button onclick="mostrar('list')">Gastos</button>
-<button onclick="mostrar('settings')">Ajustes</button>
 </div>
 
 <script>
@@ -121,33 +197,14 @@ let db = JSON.parse(localStorage.getItem('db')) || {
 let mapaMesesGlobal = {};
 let mesActualKey = '';
 
-function save(){localStorage.setItem('db',JSON.stringify(db));}
-
 function mostrar(id){
  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
  document.getElementById(id).classList.add('active');
  if(id==='home')calcular();
- if(id==='list')renderLista();
- if(id==='new')cargarMetodos();
- if(id==='settings')renderSettings();
 }
 
 function nombreMes(date){
  return date.toLocaleDateString('es-AR',{month:'long',year:'numeric'});
-}
-
-function guardar(){
- if(!fecha.value || !metodo.value) return alert('Falta completar datos');
- db.gastos.push({
-  id:Date.now(),
-  d:desc.value,
-  m:+monto.value,
-  c:tipo.value==='cuotas'?+cuotas.value:1,
-  f:fecha.value,
-  p:metodo.value
- });
- save();
- mostrar('home');
 }
 
 function calcular(){
@@ -158,17 +215,12 @@ function calcular(){
  db.gastos.forEach(g=>{
   let inicio=new Date(g.f);
   let cuota=Math.round((g.m/g.c)*100)/100;
-
   for(let i=0;i<g.c;i++){
    let d=new Date(inicio);
    d.setMonth(d.getMonth()+i);
    let key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
-
    if(!mapaMesesGlobal[key]) mapaMesesGlobal[key]=[];
-   mapaMesesGlobal[key].push({
-    desc:g.d,
-    monto:cuota
-   });
+   mapaMesesGlobal[key].push({desc:g.d,monto:cuota});
   }
  });
 
@@ -192,8 +244,8 @@ function calcular(){
   let total=(mapaMesesGlobal[m.key]||[])
    .reduce((a,b)=>a+b.monto,0);
   return `<div class="mini-card" onclick="verMes('${m.key}')">
-   <div>${nombreMes(m.date)}</div>
-   <b>$${total.toFixed(2)}</b>
+   <div class="mes">${nombreMes(m.date)}</div>
+   <div class="monto">$${total.toFixed(2)}</div>
   </div>`;
  }).join('')
  +`</div>`;
@@ -202,84 +254,33 @@ function calcular(){
  meses.slice(3).map(m=>{
   let total=(mapaMesesGlobal[m.key]||[])
    .reduce((a,b)=>a+b.monto,0);
-  return `<div>${nombreMes(m.date)}: $${total.toFixed(2)}</div>`;
+  return `<div>${nombreMes(m.date)} — $${total.toFixed(2)}</div>`;
  }).join('');
 }
 
 function verMes(key){
  let gastos=mapaMesesGlobal[key]||[];
  let total=gastos.reduce((a,b)=>a+b.monto,0);
-
  let fechaParts=key.split('-');
  let d=new Date(fechaParts[0],fechaParts[1]-1,1);
 
  mesDetalle.innerHTML=`
- <h2>${nombreMes(d)}</h2>
- <p>Total: $${total.toFixed(2)}</p>
  <div class="card">
+ <h2>${nombreMes(d)}</h2>
+ <div class="small" style="margin-bottom:8px">Total</div>
+ <div style="font-size:26px;font-weight:600;margin-bottom:18px">$${total.toFixed(2)}</div>
  ${gastos.length
-   ? gastos.map(g=>`<div>${g.desc}: $${g.monto.toFixed(2)}</div>`).join('')
+   ? gastos.map(g=>`
+     <div class="gasto-item">
+       <div>${g.desc}</div>
+       <div>$${g.monto.toFixed(2)}</div>
+     </div>
+   `).join('')
    : '<div class="small">No hay gastos este mes</div>'}
+ <button onclick="mostrar('home')" style="margin-top:20px">Volver</button>
  </div>
- <button onclick="mostrar('home')">Volver</button>
  `;
  mostrar('mesDetalle');
-}
-
-function renderLista(){
- lista.innerHTML='';
- db.gastos.forEach(g=>{
-  lista.innerHTML+=`
-  <div class="card">
-   <b>${g.d}</b><br>
-   $${g.m.toFixed(2)} – ${g.c} cuotas<br>
-   <button onclick="ver(${g.id})">Ver detalle</button>
-  </div>`;
- });
-}
-
-function ver(id){
- let g=db.gastos.find(x=>x.id===id);
- let fin=new Date(g.f); 
- fin.setMonth(fin.getMonth()+g.c-1);
-
- detail.innerHTML=`
- <h2>${g.d}</h2>
- <p>Monto total: $${g.m.toFixed(2)}</p>
- <p>Cuotas: ${g.c}</p>
- <p>Primer pago: ${g.f}</p>
- <p>Finaliza: ${fin.toISOString().slice(0,10)}</p>
- <p>Método: ${g.p}</p>
- <button class="danger" onclick="eliminar(${id})">Eliminar</button>
- <button onclick="mostrar('list')">Volver</button>`;
- mostrar('detail');
-}
-
-function eliminar(id){
- db.gastos=db.gastos.filter(g=>g.id!==id);
- save(); mostrar('home');
-}
-
-function cargarMetodos(){
- metodo.innerHTML='';
- db.metodos.forEach(m=>metodo.innerHTML+=`<option>${m}</option>`);
-}
-
-function agregarMetodo(){
- if(!nuevoMetodo.value) return;
- db.metodos.push(nuevoMetodo.value);
- nuevoMetodo.value='';
- save(); renderSettings();
-}
-
-function renderSettings(){
- ingreso.value=db.ingreso;
- metodos.innerHTML=db.metodos.map(m=>'<div>'+m+'</div>').join('');
-}
-
-function guardarAjustes(){
- db.ingreso=+ingreso.value;
- save(); mostrar('home');
 }
 
 calcular();
