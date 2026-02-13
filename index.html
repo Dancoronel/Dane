@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestor de Gastos</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Inter',sans-serif}
+body{
+  background:linear-gradient(135deg,#0f172a,#1e293b);
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+}
+.app{
+  width:100%;
+  max-width:430px;
+  padding:20px;
+}
+.card{
+  background:#1e293b;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 10px 25px rgba(0,0,0,.3);
+}
+h1{
+  font-size:22px;
+  margin-bottom:20px;
+  font-weight:700;
+}
+.balance{
+  font-size:32px;
+  font-weight:700;
+  margin-top:10px;
+}
+.future-month{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+  background:#0f172a;
+}
+.fab{
+  position:fixed;
+  bottom:80px;
+  right:20px;
+  width:60px;
+  height:60px;
+  background:#3b82f6;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  cursor:pointer;
+  box-shadow:0 10px 20px rgba(0,0,0,.4);
+}
+.nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0f172a;
+  display:flex;
+  justify-content:space-around;
+  padding:15px 0;
+}
+.nav button{
+  background:none;
+  border:none;
+  color:#94a3b8;
+  font-size:14px;
+}
+.nav button.active{
+  color:#fff;
+  font-weight:600;
+}
+.screen{display:none}
+.screen.active{display:block}
+input,select{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border-radius:12px;
+  border:none;
+}
+button.primary{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:none;
+  background:#3b82f6;
+  color:#fff;
+  font-weight:600;
+}
+.expense-item{
+  background:#0f172a;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div id="home" class="screen active">
+<h1>Resumen</h1>
+<div class="card">
+<p>Gasto mes actual</p>
+<div class="balance" id="currentTotal">$0</div>
+</div>
+<div class="card">
+<p>Próximos 3 meses</p>
+<div id="futureMonths"></div>
+</div>
+</div>
+
+<div id="new" class="screen">
+<h1>Nuevo gasto</h1>
+<input type="text" id="name" placeholder="Nombre">
+<input type="number" id="amount" placeholder="Monto">
+<select id="type">
+<option value="single">Pago único</option>
+<option value="installments">En cuotas</option>
+</select>
+<input type="number" id="installments" placeholder="Cantidad de cuotas" style="display:none">
+<button class="primary" onclick="saveExpense()">Guardar</button>
+</div>
+
+<div id="list" class="screen">
+<h1>Lista de gastos</h1>
+<div id="expenseList"></div>
+</div>
+
+<div id="settings" class="screen">
+<h1>Ajustes</h1>
+<p>Próximamente...</p>
+</div>
+
+</div>
+
+<div class="fab" onclick="showScreen('new')">+</div>
+
+<div class="nav">
+<button onclick="showScreen('home')" class="active">Inicio</button>
+<button onclick="showScreen('list')">Gastos</button>
+<button onclick="showScreen('settings')">Ajustes</button>
+</div>
+
+<script>
+let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+function saveExpense(){
+  const name=document.getElementById("name").value;
+  const amount=parseFloat(document.getElementById("amount").value);
+  const type=document.getElementById("type").value;
+  const installments=parseInt(document.getElementById("installments").value)||1;
+  if(!name||!amount)return;
+
+  expenses.push({name,amount,type,installments,date:new Date()});
+  localStorage.setItem("expenses",JSON.stringify(expenses));
+  updateUI();
+  showScreen("home");
+}
+
+function updateUI(){
+  const now=new Date();
+  const currentMonth=now.getMonth();
+  const currentYear=now.getFullYear();
+
+  let currentTotal=0;
+  let futureTotals=[0,0,0];
+
+  expenses.forEach(e=>{
+    for(let i=0;i<e.installments;i++){
+      const d=new Date(e.date);
+      d.setMonth(d.getMonth()+i);
+      if(d.getMonth()===currentMonth&&d.getFullYear()===currentYear){
+        currentTotal+=e.amount;
+      }
+      for(let j=1;j<=3;j++){
+        let future=new Date(now);
+        future.setMonth(future.getMonth()+j);
+        if(d.getMonth()===future.getMonth()&&d.getFullYear()===future.getFullYear()){
+          futureTotals[j-1]+=e.amount;
+        }
+      }
+    }
+  });
+
+  document.getElementById("currentTotal").innerText="$"+currentTotal;
+
+  const monthsContainer=document.getElementById("futureMonths");
+  monthsContainer.innerHTML="";
+  for(let i=1;i<=3;i++){
+    let d=new Date();
+    d.setMonth(d.getMonth()+i);
+    const monthName=d.toLocaleString("es-ES",{month:"long",year:"numeric"});
+    monthsContainer.innerHTML+=`
+      <div class="future-month">
+        <span>${monthName}</span>
+        <span>$${futureTotals[i-1]}</span>
+      </div>`;
+  }
+
+  const list=document.getElementById("expenseList");
+  list.innerHTML="";
+  expenses.forEach(e=>{
+    list.innerHTML+=`
+      <div class="expense-item">
+        <span>${e.name}</span>
+        <span>$${e.amount}</span>
+      </div>`;
+  });
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+  if(id==="home")document.querySelectorAll(".nav button")[0].classList.add("active");
+  if(id==="list")document.querySelectorAll(".nav button")[1].classList.add("active");
+  if(id==="settings")document.querySelectorAll(".nav button")[2].classList.add("active");
+}
+
+document.getElementById("type").addEventListener("change",function(){
+  document.getElementById("installments").style.display=
+  this.value==="installments"?"block":"none";
+});
+
+updateUI();
+</script>
+
+</body>
+</html>
