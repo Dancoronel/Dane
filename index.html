@@ -179,7 +179,6 @@ button.danger:active{
  margin-top:8px;
 }
 </style>
-
 </head>
 <body>
 
@@ -191,7 +190,7 @@ button.danger:active{
 <div id="home" class="screen active">
 <div class="card" style="text-align:center">
 <p class="small">Gasto del mes actual</p>
-<h2 id="totalMes">$0</h2>
+<h2 id="totalMes">$0.00</h2>
 </div>
 
 <div class="card">
@@ -203,7 +202,7 @@ button.danger:active{
 <div id="new" class="screen">
 <h2>Nuevo gasto</h2>
 <input id="desc" placeholder="Descripción">
-<input id="monto" type="number" placeholder="Monto total">
+<input id="monto" type="number" step="0.01" placeholder="Monto total">
 <select id="tipo">
 <option value="1">Pago único</option>
 <option value="cuotas">En cuotas</option>
@@ -224,7 +223,7 @@ button.danger:active{
 
 <div id="settings" class="screen">
 <h2>Ajustes</h2>
-<input id="ingreso" type="number" placeholder="Ingreso mensual">
+<input id="ingreso" type="number" step="0.01" placeholder="Ingreso mensual">
 <h3>Métodos de pago</h3>
 <input id="nuevoMetodo" placeholder="Nuevo método">
 <button class="primary" onclick="agregarMetodo()">Agregar método</button>
@@ -279,19 +278,24 @@ function calcular(){
 
  db.gastos.forEach(g=>{
   let inicio=new Date(g.f);
-  let cuota=g.m/g.c;
+
+  // precisión financiera a 2 decimales
+  let cuota = Math.round((g.m / g.c) * 100) / 100;
+
   for(let i=0;i<g.c;i++){
    let d=new Date(inicio);
    d.setMonth(d.getMonth()+i);
    let key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+
    if(d.getMonth()===hoy.getMonth() && d.getFullYear()===hoy.getFullYear()){
     total+=cuota;
    }
+
    mapaMeses[key]=(mapaMeses[key]||0)+cuota;
   }
  });
 
- totalMes.textContent='$'+Math.round(total);
+ totalMes.textContent='$'+total.toFixed(2);
 
  let mesesOrdenados = Object.keys(mapaMeses).sort();
  let actuales = mesesOrdenados.filter(k=>{
@@ -301,7 +305,7 @@ function calcular(){
 
  let cont=document.getElementById('futurosMeses');
  cont.innerHTML = actuales.length
-  ? actuales.map(k=>`<div>${k}: $${Math.round(mapaMeses[k])}</div>`).join('')
+  ? actuales.map(k=>`<div>${k}: $${mapaMeses[k].toFixed(2)}</div>`).join('')
   : '<div class="small">No hay gastos futuros</div>';
 }
 
@@ -311,7 +315,7 @@ function renderLista(){
   lista.innerHTML+=`
   <div class="card">
    <b>${g.d}</b><br>
-   $${g.m} – ${g.c} cuotas<br>
+   $${g.m.toFixed(2)} – ${g.c} cuotas<br>
    <button onclick="ver(${g.id})">Ver detalle</button>
   </div>`;
  });
@@ -319,10 +323,12 @@ function renderLista(){
 
 function ver(id){
  let g=db.gastos.find(x=>x.id===id);
- let fin=new Date(g.f); fin.setMonth(fin.getMonth()+g.c-1);
+ let fin=new Date(g.f); 
+ fin.setMonth(fin.getMonth()+g.c-1);
+
  detail.innerHTML=`
  <h2>${g.d}</h2>
- <p>Monto total: $${g.m}</p>
+ <p>Monto total: $${g.m.toFixed(2)}</p>
  <p>Cuotas: ${g.c}</p>
  <p>Primer pago: ${g.f}</p>
  <p>Finaliza: ${fin.toISOString().slice(0,10)}</p>
